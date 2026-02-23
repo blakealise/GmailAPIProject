@@ -97,6 +97,7 @@ public class GoogleAuthHelper {
         ListMessagesResponse listResponse = service.users()
                 .messages()
                 .list("me")           // "me" = the authenticated user
+                .setQ("is:unread label:inbox")
                 .setMaxResults(10L)
                 .execute();
         if (listResponse.getMessages() == null) {
