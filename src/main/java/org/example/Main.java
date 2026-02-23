@@ -8,7 +8,7 @@ import java.security.GeneralSecurityException;
 public class Main {
     public static void main(String[] args) throws GeneralSecurityException, IOException {
         GoogleAuthHelper.prepareGmailService();
-        HelpDeskBot.listUnreadTickets();
+        GoogleAuthHelper.listUnreadTickets();
     }
 
 }

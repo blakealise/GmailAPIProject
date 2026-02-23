@@ -85,13 +85,14 @@ public class GoogleAuthHelper {
     public static void prepareGmailService(String... args) throws IOException, GeneralSecurityException {
         // Build a new authorized API client service.
         final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-        Gmail service = new Gmail.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
+        service = new Gmail.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
                 .setApplicationName(APPLICATION_NAME)
                 .build();
     }
     public static Gmail getService(){
         return service;
     }
+
     public static void listUnreadTickets() throws IOException {
         ListMessagesResponse listResponse = service.users()
                 .messages()
@@ -106,7 +107,7 @@ public class GoogleAuthHelper {
             Message fullMsg = service.users().messages()
                     .get("me", msgRef.getId())
                     .setFormat("metadata")
-                    .setMetadataHeaders(Collections.singletonList("Subject"))
+                    .setMetadataHeaders(Arrays.asList("Subject","From"))
                     .execute();
 
             String subject = fullMsg.getPayload().getHeaders()
@@ -116,9 +117,17 @@ public class GoogleAuthHelper {
                     .findFirst()
                     .orElse("(no subject)");
 
-            System.out.println("• " + subject);
+            String from = fullMsg.getPayload().getHeaders()
+                    .stream()
+                    .filter(h -> "From".equals(h.getName()))   // lambda: keep only the "Subject" header
+                    .map(h -> h.getValue())                        // lambda: extract its value string
+                    .findFirst()
+                    .orElse("(no sender)");
+
+            System.out.println("• " + subject + from);
 
         }
+
     }
     public static void searchTickets(Gmail service, String query){
 
