@@ -12,7 +12,7 @@ public class Main {
         GoogleAuthHelper.prepareGmailService();
         //GoogleAuthHelper.listUnreadTickets();
        // GoogleAuthHelper.replyToTicket("19c91096456eb202","food for thought: 🍿🍦🥖🍍🧁🍪🍣");
-        //GoogleAuthHelper.applyLabel("19c91096456eb202" , "emails from blake");
+        GoogleAuthHelper.applyLabel("19c91096456eb202" , "emails from blake");
     }
 
 }

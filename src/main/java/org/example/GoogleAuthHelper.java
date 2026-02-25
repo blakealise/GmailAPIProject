@@ -25,6 +25,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.util.*;
+import java.util.Scanner;
 
 public class GoogleAuthHelper {
 
@@ -257,36 +258,45 @@ public class GoogleAuthHelper {
          */
 
         var labels = service.users().labels().list("me").execute();
+
+        boolean doesExist = false;
+        String labelId = "";
         for (Label label : labels.getLabels()) {
-
-            System.out.println(label.getName() + " - " + label.getId());
-            if(labelName.equals(label.getName())){
+            if(labelName.equals(label.getName())) {
                 // labelId comes from listing or creating labels above
-                ModifyMessageRequest request = new ModifyMessageRequest()
-                        .setAddLabelIds(Collections.singletonList(labelName))       // labels to add
-                        .setRemoveLabelIds(Collections.singletonList("UNREAD"));  // labels to remove (marks as read)
-
-                service.users().messages()
-                        .modify("me", messageId, request)
-                        .execute();
+                labelId = label.getId();
+                doesExist = true;
 
             }
-            else{
-                Label newLabel = new Label()
-                        .setName(labelName)
-                        .setLabelListVisibility("labelShow")      // show in the Gmail sidebar
-                        .setMessageListVisibility("show");        // show on messages in the list
-
-                Label created = service.users().labels()
-                        .create("me", newLabel)
-                        .execute();
-
-                System.out.println("Created label ID: " + created.getId());  // save this ID for later use
-            }
-            // getName() ? "IN_PROGRESS" or "INBOX" etc.
-            // getId()   ? "Label_12345" or "INBOX" etc.
         }
+
+        if(doesExist == true){
+            ModifyMessageRequest request = new ModifyMessageRequest()
+                    .setAddLabelIds(Collections.singletonList(labelId))       // labels to add
+                    .setRemoveLabelIds(Collections.singletonList("UNREAD"));  // labels to remove (marks as read)
+
+            service.users().messages()
+                    .modify("me", messageId, request)
+                    .execute();
+            return;
+        }
+        else{
+            Label newLabel = new Label()
+                    .setName("testest")
+                    .setLabelListVisibility("labelShow")      // show in the Gmail sidebar
+                    .setMessageListVisibility("show");        // show on messages in the list
+
+            Label created = service.users().labels()
+                    .create("me", newLabel)
+                    .execute();
+
+            System.out.println("Created label ID: " + created.getId());  // save this ID for later use
+        }
+
+
+
     }
+
 
     public static void trashTicket(String messageId) throws IOException {
         // Move message to trash (recoverable for 30 days)
@@ -297,5 +307,61 @@ public class GoogleAuthHelper {
         System.out.println("Message moved to Trash (30-day retention)");
     }
 
+    public static void runMenu(Gmail service) throws IOException, MessagingException {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("+----------------------------------+\n" +
+                "¦      Help-Desk Bot  \uD83D\uDCEC           ¦\n" +
+                "¦----------------------------------¦\n" +
+                "¦  1. List unread tickets          ¦\n" +
+                "¦  2. Search tickets               ¦\n" +
+                "¦  3. Read full ticket             ¦\n" +
+                "¦  4. Reply to ticket              ¦\n" +
+                "¦  5. Label ticket IN_PROGRESS     ¦\n" +
+                "¦  6. Trash a ticket               ¦\n" +
+                "¦  0. Exit                         ¦\n" +
+                "+----------------------------------+\n" +
+                "Choice:  ");
+        while(scanner.nextInt() != 0) {
+            if (scanner.nextInt() == 1) {
+                GoogleAuthHelper.listUnreadTickets();
+            }
+            if(scanner.nextInt() == 2){
+                Scanner quarry = new Scanner(System.in);
+                System.out.println("What's your query");
+                String userAnswer = quarry.nextLine();
+                GoogleAuthHelper.searchTickets(service, userAnswer);
+            }
+            if(scanner.nextInt() == 3){
+                Scanner printme = new Scanner(System.in);
+                System.out.println("What's your message Id");
+                String userAnswer = printme.nextLine();
+                GoogleAuthHelper.readTicket(userAnswer);
+            }
+            if(scanner.nextInt() == 4){
+                Scanner printme = new Scanner(System.in);
+                System.out.println("What's your message Id");
+                String userAnswer = printme.nextLine();
+                Scanner print2 = new Scanner(System.in);
+                System.out.println("What's your response");
+                String userAnswer2 = print2.nextLine();
+                GoogleAuthHelper.replyToTicket(userAnswer, userAnswer2 );
+            }
+            if(scanner.nextInt() == 5){
+                Scanner printme = new Scanner(System.in);
+                System.out.println("What's your message Id");
+                String userAnswer = printme.nextLine();
+                Scanner print2 = new Scanner(System.in);
+                System.out.println("What's the label");
+                String userAnswer2 = print2.nextLine();
+                GoogleAuthHelper.applyLabel(userAnswer, userAnswer2 );
+            }
+            if(scanner.nextInt() ==6){
+                Scanner printme = new Scanner(System.in);
+                System.out.println("What's your message Id");
+                String userAnswer = printme.nextLine();
+                GoogleAuthHelper.trashTicket(userAnswer);
+            }
+        }
+    }
 
 }
