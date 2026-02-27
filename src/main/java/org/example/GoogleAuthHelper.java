@@ -266,7 +266,6 @@ public class GoogleAuthHelper {
                 // labelId comes from listing or creating labels above
                 labelId = label.getId();
                 doesExist = true;
-
             }
         }
 
@@ -282,7 +281,7 @@ public class GoogleAuthHelper {
         }
         else{
             Label newLabel = new Label()
-                    .setName("testest")
+                    .setName(labelName)
                     .setLabelListVisibility("labelShow")      // show in the Gmail sidebar
                     .setMessageListVisibility("show");        // show on messages in the list
 
@@ -307,7 +306,7 @@ public class GoogleAuthHelper {
         System.out.println("Message moved to Trash (30-day retention)");
     }
 
-    public static void runMenu(Gmail service) throws IOException, MessagingException {
+    public static void runMenu() throws IOException, MessagingException {
         Scanner scanner = new Scanner(System.in);
         System.out.print("+----------------------------------+\n" +
                 "¦      Help-Desk Bot  \uD83D\uDCEC           ¦\n" +
