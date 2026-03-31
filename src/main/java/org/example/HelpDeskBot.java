@@ -8,6 +8,5 @@ public class HelpDeskBot {
         Gmail service = GoogleAuthHelper.getService();
     }
 
-    //HelpDeskbot.listUnreadTickets(googleAuth.getService())
 }
 //:) hi 🍪

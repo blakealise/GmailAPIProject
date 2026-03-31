@@ -9,11 +9,16 @@ import java.security.GeneralSecurityException;
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
     public static void main(String[] args) throws GeneralSecurityException, IOException, MessagingException {
-        GoogleAuthHelper.prepareGmailService();
-        GoogleAuthHelper.runMenu();
+        calendarApp.prepareCalendarService();
+      //  calendarApp.listUpcomingEvents();
+        //calendarApp.searchByDateRange();
+
+//        GoogleAuthHelper.prepareGmailService();
+//        GoogleAuthHelper.runMenu();
         //GoogleAuthHelper.listUnreadTickets();
        // GoogleAuthHelper.replyToTicket("19c91096456eb202","food for thought: 🍿🍦🥖🍍🧁🍪🍣");
 //        GoogleAuthHelper.applyLabel("19c91096456eb202" , "emails from blake");
+        calendarApp.runMenu();
     }
 
 }

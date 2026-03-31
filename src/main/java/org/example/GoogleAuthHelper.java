@@ -9,7 +9,9 @@ import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.gson.GsonFactory;
+import com.google.api.client.util.DateTime;
 import com.google.api.client.util.store.FileDataStoreFactory;
+import com.google.api.services.calendar.model.EventDateTime;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.GmailScopes;
 import com.google.api.services.gmail.model.Label;
@@ -24,6 +26,10 @@ import jakarta.mail.internet.MimeMessage;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.Scanner;
 
@@ -363,4 +369,38 @@ public class GoogleAuthHelper {
         }
     }
 
+
+//    // -- Pattern 1: "Right now" --------------------------------------------------
+//    DateTime now = new DateTime(System.currentTimeMillis());
+//
+//    // -- Pattern 2: Specific date + time ----------------------------------------
+//    ZonedDateTime zdt = LocalDateTime.of(2026, 3, 5, 10, 30)  // March 5, 10:30 AM
+//            .atZone(ZoneId.of("America/New_York"));
+//    DateTime googleDt = new DateTime(zdt.toInstant().toEpochMilli());
+//
+//    // -- Pattern 3: From a user-typed date string (e.g. "2026-03-05") -----------
+//    LocalDate userDate = LocalDate.parse("2026-03-05");
+//    DateTime startOfDay = new DateTime(
+//            userDate.atStartOfDay(ZoneId.of("America/New_York"))
+//                    .toInstant().toEpochMilli());
+//
+//    // -- Wrapping in EventDateTime for setStart() / setEnd() --------------------
+//    EventDateTime eventDt = new EventDateTime()
+//            .setDateTime(googleDt)
+//            .setTimeZone("America/New_York");  // always include the timezone!
+//
+//    EventDateTime start = event.getStart();
+//
+//    // ? Correct — handles both cases
+//    String when;
+//if (start.getDateTime() != null) {
+//        when = start.getDateTime().toString();   // timed event
+//    } else {
+//        when = start.getDate().toString();       // all-day event (no time component)
+//    }
+//
+//System.out.println(event.getSummary() + " @ " + when);
+
+// ? Will crash on all-day events!
+// System.out.println(start.getDateTime().toString());
 }
