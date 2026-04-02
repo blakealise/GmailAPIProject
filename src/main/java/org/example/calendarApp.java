@@ -21,10 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -219,31 +216,49 @@ public class calendarApp {
     public static void checkAvailability() throws IOException {
         // Check the next hour
         Scanner scan1 = new Scanner(System.in);
-        System.out.println("whats the start time - 'yyyy-mm-ddThh:mm' ");
-        String start = scan1.nextLine();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
-
-        //start needs to be converted to a DateTime
-        LocalDate startLD = LocalDate.parse(start,formatter);
-        DateTime startOfDay = new DateTime(
-                startLD.atStartOfDay(ZoneId.of("America/New_York"))
-                        .toInstant().toEpochMilli());
-
+        System.out.println("whats the start day? - 'yyyy-mm-dd' ");
+        String startDay = scan1.next();
         Scanner scan2 = new Scanner(System.in);
-        System.out.println("whats the end time - 'yyyy-mm-ddThh:mm' ");
-        String end = scan1.nextLine();
+        System.out.println("whats the start time? - 'hh-mm' ");
+        String startTime = scan2.next();
+        Scanner scan3 = new Scanner(System.in);
+        System.out.println("whats the end day - 'yyyy-mm-dd' ");
+        String endDay = scan3.next();
+        Scanner scan4 = new Scanner(System.in);
+        System.out.println("whats the end time - 'hh:mm' "); //needs to be hh:mm not hh-mm
+        String endTime = scan4.next();
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
-        //start needs to be converted to a DateTime
-        LocalDate endLD = LocalDate.parse(end,formatter);
-        DateTime checkEnd = new DateTime(
-                endLD.atStartOfDay(ZoneId.of("America/New_York"))
-                        .toInstant().toEpochMilli());
+        //LocalDate loCal = LocalDate.parse();
+        //startDay needs to be converted to a DateTime
+        System.out.println("I got all the info!");
+
+        //We first turn the user response into 4 different objects
+        LocalDate startLD = LocalDate.parse(startDay);
+        LocalTime startLT = LocalTime.parse(startTime);
+        LocalDate endLD = LocalDate.parse(endDay);
+        LocalTime endLT = LocalTime.parse(endTime);
+
+        //We then need to merge the start LocalDate and LocalTime into a singular object
+        //Same for end
+        ZonedDateTime zdtStart = LocalDateTime.of(
+                LocalDate.parse(startLD.toString()),   // "2026-03-05" ? a date object
+                LocalTime.parse(startLT.toString())    // "10:30" ? a time object
+        ).atZone(ZoneId.of("America/New_York"));
+        ZonedDateTime zdtEnd = LocalDateTime.of(
+                LocalDate.parse(endLD.toString()),   // "2026-03-05" ? a date object
+                LocalTime.parse(endLT.toString())    // "10:30" ? a time object
+        ).atZone(ZoneId.of("America/New_York"));
+
+        //We then use the method offered by ZonedDateTime to get it in the format/class that Google likes
+        DateTime startDT = new DateTime(zdtStart.toInstant().toEpochMilli());
+        DateTime endDT = new DateTime(zdtEnd.toInstant().toEpochMilli());
 
 
 
         FreeBusyRequest request = new FreeBusyRequest()
-                .setTimeMin(startOfDay)
-                .setTimeMax(checkEnd)
+                .setTimeMin(startDT)
+                .setTimeMax(endDT)
                 .setItems(List.of(new FreeBusyRequestItem().setId("primary")));
 
         FreeBusyResponse response = service.freebusy().query(request).execute();
@@ -255,7 +270,7 @@ public class calendarApp {
         } else {
             System.out.println("? Busy during:");
             for (var slot : busySlots) {
-                // Each slot has a start and end — these are RFC3339 timestamp strings
+                // Each slot has a startDay and end — these are RFC3339 timestamp strings
                 // Example: "2026-03-05T10:00:00-05:00" to "2026-03-05T11:00:00-05:00"
                 System.out.println("  " + slot.getStart() + "  ?  " + slot.getEnd());
             }
